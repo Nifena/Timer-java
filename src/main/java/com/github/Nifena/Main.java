@@ -10,21 +10,36 @@ import java.util.TimerTask;
 public class Main {
     public static void main(String[] args) throws IOException {
 
-
         String line;
         String pidInfo = "";
-        String processName = "notepad.exe";
-        String command = "taskkill /F /IM " + processName; //polecenie systemowe Win do zamkniecia systemu
+        String processName = "notepad";
+        String os = System.getProperty("os.name").toLowerCase();
+        String command = "";
 
-        Process p = Runtime.getRuntime().exec(System.getenv("windir") + "\\system32\\" + "tasklist.exe");//uruchamia tasklist.exe,
-        // zwraca lokalizacje katalogu windows, do tej sciezki dodawane sa podkatalogi
+        if (os.contains("win")){
+            command = "taskkill /F /IM " + processName + ".exe"; //polecenie systemowe Win do zamkniecia systemu
+        }else if (os.contains("mac") || os.contains("nix") || os.contains("nux")){
+            command = "pkill -9 " + processName;
+        }else {
+            System.out.println("Unsupported operating system");
+            System.exit(1);
+        }
+
+
+        Process p;
+
+        if (os.contains("win")){
+            // zwraca lokalizacje katalogu windows, do tej sciezki dodawane sa podkatalogi
+            p = Runtime.getRuntime().exec(System.getenv("windir") + "\\system32\\" + "tasklist.exe");
+        }else {
+            p = Runtime.getRuntime().exec("ps aux");
+        }
 
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));//odczytywanie wynikow linia po linii
         while ((line = input.readLine()) != null) {
-            pidInfo+=line;
+            pidInfo += line;
         }
         input.close();
-
 
 
         System.out.println("Enter the countdown time in minutes (maximum 120 minutes):");
@@ -39,6 +54,7 @@ public class Main {
         }
 
         String finalPidInfo = pidInfo;
+        String finalCommand = command;
         TimerTask task = new TimerTask(){
             final int timeInSec = setTime * 60;
             int i = 1;
@@ -48,7 +64,7 @@ public class Main {
 
                 if (i > timeInSec && finalPidInfo.contains(processName)) {
                     try {
-                        Runtime.getRuntime().exec(command);
+                        Runtime.getRuntime().exec(finalCommand);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
