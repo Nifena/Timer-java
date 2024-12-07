@@ -12,9 +12,12 @@ public class Main {
 
         String line;
         String pidInfo = "";
-        String processName = "notepad";
-        String os = System.getProperty("os.name").toLowerCase();
         String command = "";
+
+        System.out.println("Podaj nazwe procesu jaki chcesz wylaczyc");
+        String processName = new Scanner(System.in).nextLine();
+        String os = System.getProperty("os.name").toLowerCase();
+
 
         if (os.contains("win")){
             command = "taskkill /F /IM " + processName + ".exe"; //polecenie systemowe Win do zamkniecia systemu
@@ -29,7 +32,6 @@ public class Main {
         Process p;
 
         if (os.contains("win")){
-            // zwraca lokalizacje katalogu windows, do tej sciezki dodawane sa podkatalogi
             p = Runtime.getRuntime().exec(System.getenv("windir") + "\\system32\\" + "tasklist.exe");
         }else {
             p = Runtime.getRuntime().exec("ps aux");
@@ -40,6 +42,12 @@ public class Main {
             pidInfo += line;
         }
         input.close();
+
+        boolean contains = pidInfo.contains(processName);
+        if (!contains) {
+            System.out.println("Podany program nie został znaleziony");
+            System.exit(0);
+        }
 
 
         System.out.println("Enter the countdown time in minutes (maximum 120 minutes):");
@@ -62,7 +70,7 @@ public class Main {
             public void run(){
                 System.out.println(i++);
 
-                if (i > timeInSec && finalPidInfo.contains(processName)) {
+                if (i > timeInSec & finalPidInfo.contains(processName)) { //dlaczego zawiera jak jest wylaczony?
                     try {
                         Runtime.getRuntime().exec(finalCommand);
                     } catch (IOException e) {
