@@ -8,27 +8,19 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Main {
+
     public static void main(String[] args) throws IOException {
-
         Scanner scanner = new Scanner(System.in);
-
-        String line = "";
-        String pidInfo = "";
-        String command = "";
-        Process p = null;
-        String numPrefix = "";
-        String finalPidInfo = pidInfo;
-        String finalCommand = command;
 
         System.out.println("Enter the name of the process you want to terminate:");
         String processName = scanner.nextLine();
         String os = System.getProperty("os.name").toLowerCase();
 
-        checkProcess(os,command,processName,p);
+        String command = setupKillCommand(os, processName);
+        String pidInfo = getProcessInfo(os);
 
-        searchingForProcess(line,pidInfo,processName,p);
-
-        setTimer(scanner, numPrefix);
+        searchingForProcess(pidInfo, processName);
+        int setTime = setTimer(scanner);
 
         TimerTask task = new TimerTask() {
             final int timeInSec = setTime * 60;
@@ -36,10 +28,9 @@ public class Main {
 
             public void run() {
                 System.out.println(i++);
-
-                if (i > timeInSec && finalPidInfo.contains(processName)) {
+                if (i > timeInSec && pidInfo.contains(processName)) {
                     try {
-                        Runtime.getRuntime().exec(finalCommand);
+                        Runtime.getRuntime().exec(command);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -55,8 +46,9 @@ public class Main {
         Thread userInputThread = new Thread(() -> {
             while (true) {
                 String userInput = scanner.nextLine().trim();
-                if (userInput.equals("stop")) {
+                if (userInput.equalsIgnoreCase("stop")) {
                     task.cancel();
+                    System.out.println("Countdown stopped by user.");
                     System.exit(0);
                 }
             }
@@ -66,49 +58,52 @@ public class Main {
         userInputThread.start();
     }
 
-    public static void checkProcess(String os, String command, String processName, Process p) throws IOException {
+    public static String setupKillCommand(String os, String processName) {
         if (os.contains("win")) {
-            command = "taskkill /F /IM " + processName + ".exe"; // Windows system command to terminate the process
+            return "taskkill /F /IM " + processName + ".exe";
         } else if (os.contains("mac") || os.contains("nix") || os.contains("nux")) {
-            command = "pkill -9 " + processName;
+            return "pkill -9 " + processName;
         } else {
             System.out.println("Unsupported operating system");
             System.exit(1);
+            return ""; // Bezpieczny return (nigdy nie zostanie osiągnięty)
         }
+    }
 
+    public static String getProcessInfo(String os) throws IOException {
+        Process p;
         if (os.contains("win")) {
             p = Runtime.getRuntime().exec(System.getenv("windir") + "\\system32\\" + "tasklist.exe");
         } else {
             p = Runtime.getRuntime().exec("ps aux");
         }
-    }
 
-    public static void searchingForProcess(String line, String pidInfo, String processName, Process p) throws IOException {
-        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream())); // Reading output line by line
+        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        StringBuilder processInfo = new StringBuilder();
+        String line;
         while ((line = input.readLine()) != null) {
-            pidInfo += line;
+            processInfo.append(line);
         }
         input.close();
+        return processInfo.toString();
+    }
 
-        boolean contains = pidInfo.contains(processName);
-        if (!contains) {
+    public static void searchingForProcess(String pidInfo, String processName) {
+        if (!pidInfo.contains(processName)) {
             System.out.println("The specified process was not found.");
             System.exit(0);
         }
     }
 
-    public static int setTimer(Scanner scanner, String numPrefix) {
+    public static int setTimer(Scanner scanner) {
         System.out.println("Enter the countdown time in minutes (maximum 120 minutes):");
         int setTime = scanner.nextInt();
-        numPrefix = setTime == 1 ? "minute" : "minutes";
-        System.out.println("You set the timer for " + setTime + " " + numPrefix);
-        System.out.println("Type 'stop' at any time to terminate the countdown.");
-
         if (setTime > 120 || setTime < 1) {
             System.out.println("Invalid value. Please enter a time between 1 and 120 minutes.");
             System.exit(0);
         }
+        System.out.println("You set the timer for " + setTime + (setTime == 1 ? " minute." : " minutes."));
+        System.out.println("Type 'stop' at any time to terminate the countdown.");
         return setTime;
     }
 }
-
