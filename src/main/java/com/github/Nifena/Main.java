@@ -3,9 +3,7 @@ package com.github.Nifena;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class Main {
 
@@ -18,6 +16,18 @@ public class Main {
 
         String command = setupKillCommand(os, processName);
         String pidInfo = getProcessInfo(os);
+
+        Set<String> appPaths = ProcessInfoExtractor.extractApplicationPaths(os);
+
+        for (String appPath : appPaths) {
+            System.out.println(appPath);
+        }
+
+        HashMap<String, Integer> objectObjectHashMap = new HashMap<>();
+
+        for (HashMap.Entry<String, Integer> entry : objectObjectHashMap.entrySet()) {
+            objectObjectHashMap.put(entry.getKey(), entry.getValue());
+        }
 
         searchingForProcess(pidInfo, processName);
         int setTime = setTimer(scanner);
@@ -82,7 +92,7 @@ public class Main {
         StringBuilder processInfo = new StringBuilder();
         String line;
         while ((line = input.readLine()) != null) {
-            processInfo.append(line);
+            processInfo.append(line).append(System.lineSeparator());
         }
         input.close();
         return processInfo.toString();
