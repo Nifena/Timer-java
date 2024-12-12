@@ -1,8 +1,6 @@
 package com.github.Nifena;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -10,6 +8,8 @@ import java.util.regex.Pattern;
 
 public class ProcessInfoExtractor {
     public static Set<String> extractApplicationPaths(String os) throws IOException {
+
+
         Process p = null;
 
         if (os.contains("win")) {
@@ -20,7 +20,7 @@ public class ProcessInfoExtractor {
 
         System.out.println("List of running processes: ");
 
-        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream())); //czytamy linie
+        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
         Set<String> applicationPaths = new HashSet<>();
         String line;
 
