@@ -10,12 +10,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Enter the name of the process you want to terminate:");
-        String processName = scanner.nextLine();
         String os = System.getProperty("os.name").toLowerCase();
-
-        String command = setupKillCommand(os, processName);
-        String pidInfo = getProcessInfo(os);
 
         Set<String> appPaths = ProcessInfoExtractor.extractApplicationPaths(os);
 
@@ -23,11 +18,15 @@ public class Main {
             System.out.println(appPath);
         }
 
-        HashMap<String, Integer> objectObjectHashMap = new HashMap<>();
 
-        for (HashMap.Entry<String, Integer> entry : objectObjectHashMap.entrySet()) {
-            objectObjectHashMap.put(entry.getKey(), entry.getValue());
-        }
+        System.out.println("Enter the name of the process you want to terminate:");
+        String processName = scanner.nextLine();
+
+
+        String command = setupKillCommand(os, processName);
+        String pidInfo = getProcessInfo(os);
+
+
 
         searchingForProcess(pidInfo, processName);
         int setTime = setTimer(scanner);
