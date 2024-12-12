@@ -21,8 +21,6 @@ public class Main {
         String command = setupKillCommand(os, processName);
         String pidInfo = getProcessInfo(os);
 
-
-
         searchingForProcess(pidInfo, processName);
         int setTime = setTimer(scanner);
 
@@ -110,14 +108,27 @@ public class Main {
     }
 
     public static int setTimer(Scanner scanner) {
-        System.out.println("Enter the countdown time in minutes (maximum 120 minutes):");
-        int setTime = scanner.nextInt();
-        if (setTime > 120 || setTime < 1) {
-            System.out.println("Invalid value. Please enter a time between 1 and 120 minutes.");
-            System.exit(0);
+        int setTime = 0;
+
+        while (true){
+            System.out.println("Enter the countdown time in minutes (maximum 120 minutes):");
+
+            if (!scanner.hasNextInt()) {
+                System.out.println("Invalid input. Please try again.");
+                scanner.next();
+                continue;
+            }
+
+            setTime = scanner.nextInt();
+
+            if (setTime < 0 || setTime > 120) {
+                System.out.println("Invalid value. Please enter a time between 1 and 120 minutes.");
+            }else {
+                System.out.println("You set the timer for " + setTime + (setTime == 1 ? " minute." : " minutes."));
+                System.out.println("Type 'stop' at any time to terminate the countdown.");
+                break;
+            }
         }
-        System.out.println("You set the timer for " + setTime + (setTime == 1 ? " minute." : " minutes."));
-        System.out.println("Type 'stop' at any time to terminate the countdown.");
         return setTime;
     }
 }
