@@ -1,27 +1,22 @@
 package com.github.Nifena;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.sound.sampled.*;
+import java.io.*;
 import java.util.*;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException{
         Scanner scanner = new Scanner(System.in);
-
         String os = System.getProperty("os.name").toLowerCase();
 
         Set<String> appPaths = ProcessInfoExtractor.extractApplicationPaths(os);
-
         for (String appPath : appPaths) {
             System.out.println(appPath);
         }
 
-
         System.out.println("Enter the name of the process you want to terminate:");
         String processName = scanner.nextLine();
-
 
         String command = setupKillCommand(os, processName);
         String pidInfo = getProcessInfo(os);
@@ -45,6 +40,16 @@ public class Main {
                     }
                     System.out.println("Countdown complete, and " + processName + " has been terminated.");
                     System.exit(0);
+                }
+
+                try {
+                    MusicPlayer.reminder(setTime,i);
+                } catch (UnsupportedAudioFileException e) {
+                    throw new RuntimeException(e);
+                } catch (LineUnavailableException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
         };
