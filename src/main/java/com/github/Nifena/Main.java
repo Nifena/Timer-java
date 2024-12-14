@@ -8,12 +8,10 @@ public class Main {
 
     public static void main(String[] args) throws IOException{
         Scanner scanner = new Scanner(System.in);
+        Blocklist blocklist = new Blocklist();
         String os = System.getProperty("os.name").toLowerCase();
 
-        Set<String> appPaths = ProcessInfoExtractor.extractApplicationPaths(os);
-        for (String appPath : appPaths) {
-            System.out.println(appPath);
-        }
+        ProcessInfoExtractor.runnedApplications(os);
 
         System.out.println("Enter the name of the process you want to terminate:");
         String processName = scanner.nextLine();
@@ -58,7 +56,7 @@ public class Main {
         Thread userInputThread = new Thread(() -> {
             while (true) {
                 String userInput = scanner.nextLine().trim();
-                if (userInput.equalsIgnoreCase("stop")) {
+                if (userInput.equalsIgnoreCase("s")) {
                     task.cancel();
                     System.out.println("Countdown stopped by user.");
                     System.exit(0);
@@ -68,6 +66,9 @@ public class Main {
 
         userInputThread.setDaemon(true);
         userInputThread.start();
+
+        blocklist.blockApplications(os);
+
     }
 
     public static String setupKillCommand(String os, String processName) {
@@ -78,7 +79,7 @@ public class Main {
         } else {
             System.out.println("Unsupported operating system");
             System.exit(1);
-            return ""; // Bezpieczny return (nigdy nie zostanie osiągnięty)
+            return "";
         }
     }
 
@@ -125,7 +126,7 @@ public class Main {
                 System.out.println("Invalid value. Please enter a time between 1 and 120 minutes.");
             }else {
                 System.out.println("You set the timer for " + setTime + (setTime == 1 ? " minute." : " minutes."));
-                System.out.println("Type 'stop' at any time to terminate the countdown.");
+                System.out.println("Type 's' at any time to terminate the countdown.");
                 break;
             }
         }

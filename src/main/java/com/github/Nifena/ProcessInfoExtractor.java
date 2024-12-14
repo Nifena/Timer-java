@@ -7,9 +7,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ProcessInfoExtractor {
+
+    public static Set<String> extractApplicationNames(String os) throws IOException {
+        Set<String> appPaths = extractApplicationPaths(os);
+        Set<String> appNames = new HashSet<>();
+
+        for (String appPath : appPaths) {
+            appNames.add(extractAppName(appPath, os));
+        }
+
+        return appNames;
+    }
+
     public static Set<String> extractApplicationPaths(String os) throws IOException {
-
-
         Process p = null;
 
         if (os.contains("win")) {
@@ -17,8 +27,6 @@ public class ProcessInfoExtractor {
         } else {
             p = Runtime.getRuntime().exec("ps aux");
         }
-
-        System.out.println("List of running processes: ");
 
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
         Set<String> applicationPaths = new HashSet<>();
@@ -63,4 +71,23 @@ public class ProcessInfoExtractor {
 
         return fullPath.substring(index1,index2);
     }
+
+    public static void runnedApplications(String os) throws IOException {
+        System.out.println("List of running processes: ");
+        Set<String> appPaths = ProcessInfoExtractor.extractApplicationPaths(os);
+        for (String appPath : appPaths) {
+            System.out.println(appPath);
+        }
+    }
+
+    private static String extractAppName(String appPath, String os) {
+        if (os.contains("win")) {
+            return appPath.substring(appPath.lastIndexOf("\\") + 1).replace(".exe", "");
+        } else if (os.contains("mac")) {
+            return appPath.substring(appPath.lastIndexOf("/") + 1).replace(".app", "");
+        } else {
+            return appPath; // Dla innych systemów zwróć pełną nazwę
+        }
+    }
+
 }
