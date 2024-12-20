@@ -9,8 +9,8 @@ public class Main {
     public static void main(String[] args) throws IOException{
         Scanner scanner = new Scanner(System.in);
         Blocklist blocklist = new Blocklist();
-        String os = System.getProperty("os.name").toLowerCase();
 
+        String os = System.getProperty("os.name").toLowerCase();
         ProcessInfoExtractor.runnedApplications(os);
 
         System.out.println("Enter the name of the process you want to terminate:");
@@ -22,54 +22,12 @@ public class Main {
         searchingForProcess(pidInfo, processName);
         int setTime = setTimer(scanner);
 
-        TimerTask task = new TimerTask() {
-            final int timeInSec = setTime * 60;
-            int i = 1;
-
-            public void run() {
-                System.out.println(i++);
-                if (i > timeInSec && pidInfo.contains(processName)) {
-                    try {
-                        Runtime.getRuntime().exec(command);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    System.out.println("Countdown complete, and " + processName + " has been terminated.");
-                    System.exit(0);
-                }
-
-                try {
-                    MusicPlayer.reminder(setTime,i);
-                } catch (UnsupportedAudioFileException e) {
-                    throw new RuntimeException(e);
-                } catch (LineUnavailableException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        };
-
-        Timer timer = new Timer("Timer");
-        timer.schedule(task, 1000L, 1000L);
-
-        Thread userInputThread = new Thread(() -> {
-            while (true) {
-                String userInput = scanner.nextLine().trim();
-                if (userInput.equalsIgnoreCase("s")) {
-                    task.cancel();
-                    System.out.println("Countdown stopped by user.");
-                    System.exit(0);
-                }
-            }
-        });
-
-        userInputThread.setDaemon(true);
-        userInputThread.start();
-
-        blocklist.blockApplications(os);
+        runTimer(scanner, pidInfo,processName,command,os, setTime);
 
     }
+
+
+
 
     public static String setupKillCommand(String os, String processName) {
         if (os.contains("win")) {
@@ -131,5 +89,56 @@ public class Main {
             }
         }
         return setTime;
+    }
+
+    public static void runTimer (Scanner scanner, String pidInfo, String processName, String command, String os, int setTime ) throws IOException {
+        Blocklist blocklist = new Blocklist();
+
+        TimerTask task = new TimerTask() {
+            final int timeInSec = setTime * 60;
+            int i = 1;
+
+            public void run() {
+                System.out.println(i++);
+                if (i > timeInSec && pidInfo.contains(processName)) {
+                    try {
+                        Runtime.getRuntime().exec(command);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    System.out.println("Countdown complete, and " + processName + " has been terminated.");
+                    System.exit(0);
+                }
+
+                try {
+                    MusicPlayer.reminder(setTime,i);
+                } catch (UnsupportedAudioFileException e) {
+                    throw new RuntimeException(e);
+                } catch (LineUnavailableException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+
+        Timer timer = new Timer("Timer");
+        timer.schedule(task, 1000L, 1000L);
+
+        Thread userInputThread = new Thread(() -> {
+            while (true) {
+                String userInput = scanner.nextLine().trim();
+                if (userInput.equalsIgnoreCase("s")) {
+                    task.cancel();
+                    System.out.println("Countdown stopped by user.");
+                    System.exit(0);
+                }
+            }
+        });
+
+        userInputThread.setDaemon(true);
+        userInputThread.start();
+
+        blocklist.blockApplications(os);
     }
 }

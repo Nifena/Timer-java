@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Set;
 
 public class Blocklist{
-    private final Set<String> blockedApps = Set.of("Battlenet","Steam","Safari");
+    private final Set<String> blockedApps = Set.of("Battlenet","Steam");
 
     public void blockApplications(String os) throws IOException {
 
