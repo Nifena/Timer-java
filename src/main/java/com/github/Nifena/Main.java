@@ -27,8 +27,6 @@ public class Main {
     }
 
 
-
-
     public static String setupKillCommand(String os, String processName) {
         if (os.contains("win")) {
             return "taskkill /F /IM " + processName + ".exe";
@@ -125,6 +123,12 @@ public class Main {
         Timer timer = new Timer("Timer");
         timer.schedule(task, 1000L, 1000L);
 
+        Thread userInputThread = getThread(scanner, task);
+        userInputThread.start();
+
+        blocklist.blockApplications(os);
+    }
+    private static Thread getThread(Scanner scanner, TimerTask task) {
         Thread userInputThread = new Thread(() -> {
             while (true) {
                 String userInput = scanner.nextLine().trim();
@@ -132,13 +136,19 @@ public class Main {
                     task.cancel();
                     System.out.println("Countdown stopped by user.");
                     System.exit(0);
+                }else if(userInput.equalsIgnoreCase("p")){
+                    try {
+                        task.wait();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else if (userInput.equalsIgnoreCase("c")) {
+                    task.run();
                 }
             }
         });
 
         userInputThread.setDaemon(true);
-        userInputThread.start();
-
-        blocklist.blockApplications(os);
+        return userInputThread;
     }
 }

@@ -3,11 +3,13 @@ package com.github.Nifena;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 
 public class MusicPlayer {
 
     public static void player() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
-        File soundFile = new File("src/main/Resources/bell-ring.wav");
+        String pathName = "src/main/Resources/bell-ring.wav";
+        File soundFile = new File(pathName);
         AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
 
         Clip clip = AudioSystem.getClip();
