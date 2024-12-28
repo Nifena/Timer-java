@@ -12,6 +12,10 @@ public class MusicPlayer {
         File soundFile = new File(pathName);
         AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
 
+        if (audioStream == null) {
+            throw new NoSuchFileException(pathName);
+        }
+
         Clip clip = AudioSystem.getClip();
         clip.open(audioStream);
         clip.start();
