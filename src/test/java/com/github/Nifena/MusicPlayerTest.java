@@ -9,39 +9,28 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MusicPlayerTest {
-@Test
-    void test_correct_path() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
-    //Arrange
-    var pathName= "src/main/Resources/bell-ring.wav";
-    var soundFile = new File(pathName);
-    //Act - glowna rzecz do przetestowania
 
-    boolean soundExists = soundFile.exists();
-    AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
-    Clip clip = AudioSystem.getClip();
-    clip.open(audioStream);
-//    boolean audioExists = audioStream.available() > 0;
-    boolean clipExists = clip.getFrameLength() >0;
-    //Assert
-    assertTrue(soundExists);
-//    assertTrue(audioExists);
-    assertEquals(true, clipExists);
-
-}
 @Test
-    void test_wrong_path(){
-    //Arrange
-    var pathName= "src/main/Resources/bell-ringring.wav";
-    var soundFile = new File(pathName);
-    //Act
-    boolean soundExists = soundFile.exists();
-    //Assert
-    assertFalse(soundExists);
-    assertThrows(IOException.class,()-> AudioSystem.getAudioInputStream(soundFile)
-    );
+void test_player_with_valid_audio() {
+    // Arrange
+    String validPath = "src/main/Resources/bell-ring.wav";
+
+    // Act & Assert
+    assertDoesNotThrow(() -> MusicPlayer.player(validPath));
 }
 
-@Test
+
+    @Test
+    void test_player_with_invalid_audio() {
+        // Arrange
+        String invalidPath = "src/main/Resources/nonexistent.wav";
+
+        // Act & Assert
+        assertThrows(IOException.class, () -> MusicPlayer.player(invalidPath));
+    }
+
+
+    @Test
     void test_wrong_format(){
     var pathName= "src/main/Resources/bell-ring.wavv";
     var soundFile = new File(pathName);
@@ -86,8 +75,6 @@ class MusicPlayerTest {
     int i = 45 * 60;
     MusicPlayer.reminder(setTime,i);
 }
-
-
 
 
 }
